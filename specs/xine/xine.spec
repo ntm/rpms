@@ -68,8 +68,11 @@ Available rpmbuild rebuild options :
 %{!?_without_lirc:%patch0 -p1 -b .shared-lirc}
 %patch1 -p0 -b .help
 
+# options for configure need to be fed both to autogen.sh and to configure
+%define _config_opts --x-libraries="%{_prefix}/X11R6/%{_lib}" --with-aalib %{?_without_lirc:--disable-lirc} %{?_without_caca:--without-caca}
+
 # Required by the shared-lirc patch
-./autogen.sh
+./autogen.sh %{_config_opts}
 
 # Replace the default splash screen
 %{__cp} -a -f %{SOURCE2} misc/xine_splash.png
@@ -118,11 +121,7 @@ done
 
 %build
 
-%configure \
-    --x-libraries="%{_prefix}/X11R6/%{_lib}" \
-    --with-aalib \
-%{?_without_lirc:--disable-lirc} \
-%{?_without_caca:--without-caca}
+%configure %{_config_opts}
 
 %{__make} %{?_smp_mflags}
 
